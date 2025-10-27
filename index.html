@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>King David Achievement Hub</title>
+<style>
+    /* ----- CSS ----- */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+    }
+
+    header {
+        background-color: #1f3b5f;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    header h1 { margin: 0; font-size: 2.5em; }
+    header p { margin: 5px 0 0; font-size: 1.1em; opacity: 0.8; }
+
+    nav {
+        background-color: #2980b9;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    nav button {
+        background: none;
+        border: none;
+        color: white;
+        padding: 15px 20px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    nav button:hover, nav button.active { background-color: #1f3b5f; border-radius: 8px; }
+
+    .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+
+    h2 { color: #1f3b5f; margin-bottom: 10px; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Forms */
+    .student-form, .news-form, .event-form, .search-bar {
+        display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;
+    }
+    input, select, textarea, button {
+        padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 1em;
+    }
+    input, select, textarea { flex: 1; }
+    button {
+        background-color: #27ae60; color: white; border: none; cursor: pointer; transition: 0.3s;
+    }
+    button:hover { background-color: #2ecc71; }
+
+    /* Cards */
+    .achievements-grid, .news-grid, .events-grid, .dashboard-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
+    }
+    .achievement-card, .news-card, .event-card, .dashboard-card {
+        background-color: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .achievement-card:hover, .news-card:hover, .event-card:hover, .dashboard-card:hover {
+        transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    .achievement-header {
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+    }
+    .student-name { font-weight: bold; font-size: 1.2em; color: #1f3b5f; }
+    .badge { padding: 5px 10px; border-radius: 12px; color: white; font-size: 0.8em; }
+    .Academic { background-color: #2980b9; }
+    .Sports { background-color: #e67e22; }
+    .Arts { background-color: #8e44ad; }
+    .Other { background-color: #7f8c8d; }
+    .achievement-desc, .news-desc, .event-desc { font-size: 0.95em; color: #555; margin-top: 5px; }
+
+    .filter-section { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* News Slider */
+    .news-slider { position: relative; margin-bottom: 30px; height: 140px; overflow: hidden; border-radius: 12px; }
+    .news-slide {
+        position: absolute; width: 100%; padding: 20px; background-color: #2980b9; color: white; border-radius: 12px;
+        transition: opacity 1s ease-in-out; opacity: 0;
+    }
+    .news-slide.active { opacity: 1; }
+
+    /* Responsive */
+    @media(max-width:600px){
+        nav { flex-direction: column; }
+        .student-form, .news-form, .event-form, .search-bar { flex-direction: column; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>King David Achievement Hub</h1>
+    <p>Showcasing Student Excellence & School Updates</p>
+</header>
+
+<nav>
+    <button class="tab-link active" onclick="openTab(event,'Home')">Home</button>
+    <button class="tab-link" onclick="openTab(event,'Achievements')">Achievements</button>
+    <button class="tab-link" onclick="openTab(event,'News')">News</button>
+    <button class="tab-link" onclick="openTab(event,'Events')">Events</button>
+</nav>
+
+<div class="container">
+
+    <!-- Home Tab -->
+    <div id="Home" class="tab-content active">
+        <h2>Dashboard Overview</h2>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <input type="text" id="dashboardSearch" placeholder="Search Achievements, News, or Events..." onkeyup="searchDashboard()">
+        </div>
+
+        <div class="dashboard-grid" id="dashboardGrid">
+            <!-- Latest Achievements, News, Events will appear here -->
+        </div>
+    </div>
+
+    <!-- Achievements Tab -->
+    <div id="Achievements" class="tab-content">
+        <h2>Student Achievements</h2>
+        <div class="student-form">
+            <input type="text" id="studentName" placeholder="Student Name">
+            <input type="text" id="achievementTitle" placeholder="Achievement Title">
+            <select id="achievementCategory">
+                <option value="Academic">Academic</option>
+                <option value="Sports">Sports</option>
+                <option value="Arts">Arts</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="text" id="achievementDesc" placeholder="Achievement Details">
+            <button onclick="addAchievement()">Add Achievement</button>
+        </div>
+        <div class="filter-section">
+            <select id="filterCategory" onchange="filterAchievements()">
+                <option value="All">All Categories</option>
+                <option value="Academic">Academic</option>
+                <option value="Sports">Sports</option>
+                <option value="Arts">Arts</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="achievements-grid" id="achievementsGrid"></div>
+    </div>
+
+    <!-- News Tab -->
+    <div id="News" class="tab-content">
+        <h2>News Highlights</h2>
+        <div class="news-slider" id="newsSlider"></div>
+
+        <h2>All News & Updates</h2>
+        <div class="news-form">
+            <input type="text" id="newsTitle" placeholder="News Title">
+            <textarea id="newsDesc" rows="2" placeholder="News Details"></textarea>
+            <button onclick="addNews()">Post News</button>
+        </div>
+        <div class="news-grid" id="newsGrid"></div>
+    </div>
+
+    <!-- Events Tab -->
+    <div id="Events" class="tab-content">
+        <h2>Upcoming Events</h2>
+        <div class="event-form">
+            <input type="date" id="eventDate">
+            <input type="text" id="eventTitle" placeholder="Event Title">
+            <textarea id="eventDesc" rows="2" placeholder="Event Details"></textarea>
+            <button onclick="addEvent()">Add Event</button>
+        </div>
+        <div class="events-grid" id="eventsGrid"></div>
+    </div>
+
+</div>
+
+<script>
+    // ----- JavaScript -----
+    let achievements = [];
+    let newsList = [];
+    let events = [];
+
+    // Tab Navigation
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+        if(tabName==='Home') renderDashboard();
+    }
+
+    // Achievements
+    function addAchievement() {
+        const name = document.getElementById('studentName').value.trim();
+        const title = document.getElementById('achievementTitle').value.trim();
+        const category = document.getElementById('achievementCategory').value;
+        const desc = document.getElementById('achievementDesc').value.trim();
+        if (!name || !title || !desc) return alert("Fill all achievement fields");
+        achievements.unshift({ name, title, category, desc });
+        renderAchievements();
+        document.getElementById('studentName').value='';
+        document.getElementById('achievementTitle').value='';
+        document.getElementById('achievementDesc').value='';
+    }
+
+    function renderAchievements(filter='All'){
+        const grid=document.getElementById('achievementsGrid');
+        grid.innerHTML='';
+        achievements.filter(a=>filter==='All'||a.category===filter).forEach(a=>{
+            const card=document.createElement('div');
+            card.classList.add('achievement-card');
+            card.innerHTML=`
+                <div class="achievement-header">
+                    <div class="student-name">${a.name}</div>
+                    <div class="badge ${a.category}">${a.category}</div>
+                </div>
+                <div class="achievement-desc"><strong>${a.title}</strong><br>${a.desc}</div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    function filterAchievements(){ renderAchievements(document.getElementById('filterCategory').value); }
+
+    // News
+    function addNews(){
+        const title=document.getElementById('newsTitle').value.trim();
+        const desc=document.getElementById('newsDesc').value.trim();
+        if(!title || !desc) return alert("Fill all news fields");
+        const date=new Date().toLocaleDateString();
+        newsList.unshift({title,desc,date});
+        renderNews();
+        renderNewsSlider();
+        document.getElementById('newsTitle').value='';
+        document.getElementById('newsDesc').value='';
+    }
+
+    function renderNews(){
+        const grid=document.getElementById('newsGrid');
+        grid.innerHTML='';
+        newsList.forEach(n=>{
+            const card=document.createElement('div'); card.classList.add('news-card');
+            card.innerHTML=`
+                <div class="achievement-header">
+                    <div class="student-name">${n.title}</div>
+                    <div class="badge Other">${n.date}</div>
+                </div>
+                <div class="news-desc">${n.desc}</div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    function renderNewsSlider(){
+        const slider=document.getElementById('newsSlider');
+        slider.innerHTML='';
+        newsList.slice(0,3).forEach((n,i)=>{
+            const div=document.createElement('div'); div.classList.add('news-slide');
+            if(i===0) div.classList.add('active');
+            div.innerHTML=`<strong>${n.title}</strong><br>${n.desc}`;
+            slider.appendChild(div);
+        });
+        let index=0;
+        setInterval(()=>{
+            const slides=document.querySelectorAll('.news-slide');
+            slides.forEach(s=>s.classList.remove('active'));
+            index=(index+1)%slides.length;
+            if(slides[index]) slides[index].classList.add('active');
+        },4000);
+    }
+
+    // Events
+    function addEvent(){
+        const date=document.getElementById('eventDate').value;
+        const title=document.getElementById('eventTitle').value.trim();
+        const desc=document.getElementById('eventDesc').value.trim();
+        if(!date || !title || !desc) return alert("Fill all event fields");
+        events.unshift({date,title,desc});
+        renderEvents();
+        document.getElementById('eventDate').value='';
+        document.getElementById('eventTitle').value='';
+        document.getElementById('eventDesc').value='';
+    }
+
+    function renderEvents(){
+        const grid=document.getElementById('eventsGrid');
+        grid.innerHTML='';
+        events.sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(e=>{
+            const card=document.createElement('div'); card.classList.add('event-card');
+            card.innerHTML=`
+                <div class="achievement-header">
+                    <div class="student-name">${e.title}</div>
+                    <div class="badge Other">${new Date(e.date).toLocaleDateString()}</div>
+                </div>
+                <div class="event-desc">${e.desc}</div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    // Dashboard
+    function renderDashboard(searchText=''){
+        const grid=document.getElementById('dashboardGrid');
+        grid.innerHTML='';
+        const query = searchText.toLowerCase();
+
+        // Latest Achievements (filtered)
+        achievements.slice(0,3).filter(a=>{
+            return a.name.toLowerCase().includes(query) || a.title.toLowerCase().includes(query) || a.desc.toLowerCase().includes(query);
+        }).forEach(a=>{
+            const card=document.createElement('div'); card.classList.add('dashboard-card');
+            card.innerHTML=`
+                <div class="achievement-header">
+                    <div class="student-name">${a.name}</div>
+                    <div class="badge ${a.category}">${a.category}</div>
+                </div>
+                <div class="achievement-desc"><strong>${a.title}</strong><br>${a.desc}</div>`;
+            grid.appendChild(card);
+        });
+
+        // Latest News (filtered)
+        newsList.slice(0,3).filter(n=>{
+            return n.title.toLowerCase().includes(query) || n.desc.toLowerCase().includes(query);
+        }).forEach(n=>{
+            const card=document.createElement('div'); card.classList.add('dashboard-card');
+            card.innerHTML=`
+                <div class="achievement-header">
+                    <div class="student-name">${n.title}</div>
+                    <div class="badge Other">${n.date}</div>
+                </div>
+                <div class="news-desc">${n.desc}</div>`;
+            grid.appendChild(card);
+        });
+
+        // Next Events (filtered)
+        events.sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,3).filter(e=>{
+            return e.title.toLowerCase().includes(query) || e.desc.toLowerCase().includes(query);
+        }).forEach(e=>{
+            const card=document.createElement('div'); card.classList.add('dashboard-card');
+            card.innerHTML=`
+                <div class="achievement-header">
+                    <div class="student-name">${e.title}</div>
+                    <div class="badge Other">${new Date(e.date).toLocaleDateString()}</div>
+                </div>
+                <div class="event-desc">${e.desc}</div>`;
+            grid.appendChild(card);
+        });
+    }
+
+    function searchDashboard(){
+        const text=document.getElementById('dashboardSearch').value.trim();
+        renderDashboard(text);
+    }
+
+    // Initial Rendering
+    renderAchievements();
+    renderNews();
+    renderNewsSlider();
+    renderEvents();
+    renderDashboard();
+</script>
+
+</body>
+</html>
